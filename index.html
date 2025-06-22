@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Point of Sale Wanen Coffee</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="screen active">
+        <div class="login-container">
+            <h2>Login Karyawan</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="employeeId">ID Karyawan:</label>
+                    <select id="employeeId" required>
+                        <option value="" >Pilih Karyawan</option>
+                        <option value="admin">Admin</option>
+                        <option value="emp001">Karyawan 001</option>
+                        <option value="emp002">Karyawan 002</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="pin">PIN:</label>
+                    <input type="password" id="pin" maxlength="4" required>
+                </div>
+                <button type="submit">Login</button>
+                <div class="login-help">
+                    <!-- <small>Default PIN: Admin = 0001, Karyawan = 4444, 5555</small> -->
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main POS Interface -->
+    <div id="mainScreen" class="screen">
+        <header class="pos-header">
+            <h1>Point of Sales</h1>
+            <div class="header-info">
+                <span id="currentUser">Pengguna: -</span>
+                <span id="currentDate"></span>
+                <button id="logoutBtn">Logout</button>
+            </div>
+        </header>
+
+        <nav class="main-nav">
+            <button class="nav-btn active" data-section="cashier">Kasir</button>
+            <button class="nav-btn" data-section="products" id="productsNavBtn">Produk</button>
+            <button class="nav-btn" data-section="reports" id="reportsNavBtn">Laporan</button>
+        </nav>
+
+        <!-- Cashier Section -->
+        <section id="cashierSection" class="section active">
+            <div class="cashier-layout">
+                <div class="products-panel">
+                    <h3>Daftar Produk</h3>
+                    <div class="category-filter">
+                        <select id="categoryFilter">
+                            <option value="">Semua Kategori</option>
+                        </select>
+                    </div>
+                    <div id="productsList" class="products-grid"></div>
+                </div>
+                
+                <div class="cart-panel">
+                    <h3>Keranjang Belanja</h3>
+                    <div id="cartItems" class="cart-items"></div>
+                    <div class="cart-summary">
+                        <div class="summary-line">
+                            <span>Subtotal:</span>
+                            <span id="subtotal">Rp 0</span>
+                        </div>
+                        <div class="summary-line">
+                            <span>Pajak (10%):</span>
+                            <span id="tax">Rp 0</span>
+                        </div>
+                        <div class="summary-line total">
+                            <span>Total:</span>
+                            <span id="total">Rp 0</span>
+                        </div>
+                    </div>
+                    <div class="payment-section">
+                        <div class="form-group">
+                            <label>Metode Pembayaran:</label>
+                            <select id="paymentMethod">
+                                <option value="cash">Tunai</option>
+                                <option value="card">Kartu</option>
+                                <option value="ewallet">E-Wallet</option>
+                            </select>
+                        </div>
+                        <div id="cashPayment" class="payment-details">
+                            <div class="form-group">
+                                <label for="cashReceived">Uang Diterima:</label>
+                                <input type="number" id="cashReceived" min="0" step="1000">
+                            </div>
+                            <div class="change-display">
+                                <span>Kembalian: <span id="change">Rp 0</span></span>
+                            </div>
+                        </div>
+                        <button id="processPayment" class="payment-btn" disabled>Proses Pembayaran</button>
+                        <button id="clearCart" class="clear-btn">Kosongkan Keranjang</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Products Management Section -->
+        <section id="productsSection" class="section">
+            <div class="section-header">
+                <h3>Manajemen Produk</h3>
+                <button id="addProductBtn" class="btn-primary">Tambah Produk</button>
+            </div>
+            <div class="products-table-container">
+                <table id="productsTable" class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Kode</th>
+                            <th>Nama</th>
+                            <th>Kategori</th>
+                            <th>Harga</th>
+                            <th>Stok</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Reports Section -->
+        <section id="reportsSection" class="section">
+            <div class="section-header">
+                <h3>Laporan Penjualan</h3>
+                <div class="report-filters">
+                    <select id="reportType">
+                        <option value="daily">Harian</option>
+                        <option value="monthly">Bulanan</option>
+                    </select>
+                    <input type="date" id="reportDate">
+                    <button id="generateReport">Generate Laporan</button>
+                </div>
+            </div>
+            <div id="reportContent" class="report-content">
+                <div class="report-summary">
+                    <div class="summary-card">
+                        <h4>Total Penjualan</h4>
+                        <span id="totalSales">Rp 0</span>
+                    </div>
+                    <div class="summary-card">
+                        <h4>Jumlah Transaksi</h4>
+                        <span id="totalTransactions">0</span>
+                    </div>
+                    <div class="summary-card">
+                        <h4>Rata-rata per Transaksi</h4>
+                        <span id="avgTransaction">Rp 0</span>
+                    </div>
+                </div>
+                <div class="report-details">
+                    <h4>Produk Terlaris</h4>
+                    <table id="topProductsTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Produk</th>
+                                <th>Terjual</th>
+                                <th>Total Revenue</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Product Modal -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3 id="modalTitle">Tambah Produk</h3>
+            <form id="productForm">
+                <div class="form-group">
+                    <label for="productCode">Kode Produk:</label>
+                    <input type="text" id="productCode" required>
+                </div>
+                <div class="form-group">
+                    <label for="productName">Nama Produk:</label>
+                    <input type="text" id="productName" required>
+                </div>
+                <div class="form-group">
+                    <label for="productCategory">Kategori:</label>
+                    <select id="productCategory" required>
+                        <option value="">Pilih Kategori</option>
+                        <option value="makanan">Makanan</option>
+                        <option value="minuman">Minuman</option>
+                        <option value="snack">Snack</option>
+                        <option value="lainnya">Lainnya</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="productPrice">Harga:</label>
+                    <input type="number" id="productPrice" min="0" step="100" required>
+                </div>
+                <div class="form-group">
+                    <label for="productStock">Stok:</label>
+                    <input type="number" id="productStock" min="0" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Simpan</button>
+                    <button type="button" class="btn-secondary" onclick="closeProductModal()">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Receipt Modal -->
+    <div id="receiptModal" class="modal">
+        <div class="modal-content receipt-content">
+            <span class="close">&times;</span>
+            <div id="receiptContent" class="receipt"></div>
+            <div class="receipt-actions">
+                <button onclick="printReceipt()" class="btn-primary">Print</button>
+                <button onclick="closeReceiptModal()" class="btn-secondary">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
