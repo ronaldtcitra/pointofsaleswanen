@@ -261,7 +261,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .btn-print:hover{background:var(--accent2)}
 .btn-close-r{flex:1;padding:11px;background:transparent;border:1px solid var(--border2);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text2);cursor:pointer;transition:all var(--transition)}
 .btn-close-r:hover{color:var(--text);border-color:var(--border2)}
-
+#transactionHistoryTable td:nth-child(5){
+    min-width:280px;
+    white-space:normal;
+}
 @media(max-width:768px){
   #cashierSection.active{grid-template-columns:1fr}
   .products-grid{max-height:300px}
@@ -284,7 +287,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <div class="login-title">Masuk ke Akun Anda</div>
       <form id="loginForm">
         <div class="field">
-          <label>ID Karyawan</label>
+          <label>Username</label>
           <div class="select-wrap">
             <select id="employeeId" required>
               <option value="">Pilih karyawan…</option>
@@ -295,8 +298,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
           </div>
         </div>
         <div class="field">
-          <label>PIN</label>
-          <input type="password" id="pin" maxlength="4" pattern="[0-9]{4}" placeholder="••••" required>
+          <label>Password</label>
+          <input type="password" id="pin" maxlength="4" pattern="[0-9]{4}" placeholder="••••••••" required>
         </div>
         <button type="submit" class="btn-login">Masuk</button>
       </form>
@@ -347,7 +350,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
           </div>
         </div>
         <div class="cart-footer">
-          <div class="summary-rows">
+          <!-- <div class="summary-rows">
             <div class="summary-row"><span>Subtotal</span><span id="subtotal">Rp 0</span></div>
             <div class="summary-row"><span>Pajak 10%</span><span id="tax">Rp 0</span></div>
             <div class="summary-row total"><span>Total</span><span id="total">Rp 0</span></div>
@@ -367,7 +370,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
               <span class="label">Kembalian</span>
               <span class="amount" id="change">Rp 0</span>
             </div>
-          </div>
+          </div> -->
           <button id="processPayment" class="btn-pay" disabled>Proses Pembayaran</button>
           <button id="clearCart" class="btn-clear">Kosongkan Keranjang</button>
         </div>
@@ -399,7 +402,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <div class="report-top" style="margin-bottom:0">
           <select id="reportType" class="filter-select">
             <option value="daily">Harian</option>
-            <option value="monthly">Bulanan</option>
+            <option value="monthly" selected>Bulanan</option>
           </select>
           <input type="date" id="reportDate" class="filter-input">
           <button id="generateReport" class="btn-gen">Generate</button>
@@ -420,7 +423,33 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
             <div class="stat-val" id="avgTransaction">Rp 0</div>
           </div>
         </div>
-        <div class="report-section">
+        <div class="report-section" style="margin-top:20px;">
+
+    <div class="report-section-title">
+        History Transaksi
+    </div>
+
+    <table id="transactionHistoryTable" class="data-table">
+
+        <thead>
+    <tr>
+        <th>Waktu</th>
+        <th>Kasir</th>
+        <th>Customer</th>
+        <th>Jumlah Item</th>
+        <th>Item Dibeli</th>
+        <th>Uang Diterima</th>
+        <th>Kembalian</th>
+        <th>Metode</th>
+    </tr>
+</thead>
+
+        <tbody></tbody>
+
+    </table>
+
+</div>
+        <div class="report-section" style="margin-top:20px">
           <div class="report-section-title">Produk Terlaris</div>
           <table id="topProductsTable" class="data-table">
             <thead>
@@ -462,7 +491,82 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     </form>
   </div>
 </div>
+<!-- PAYMENT MODAL -->
+<div id="paymentModal" class="modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closePaymentModal()">×</button>
 
+    <div class="modal-title">
+      Pembayaran
+    </div>
+
+    <div class="summary-rows">
+      <div class="summary-row">
+        <span>Subtotal</span>
+        <span id="modalSubtotal">Rp 0</span>
+      </div>
+
+      <div class="summary-row">
+        <span>Pajak 10%</span>
+        <span id="modalTax">Rp 0</span>
+      </div>
+
+      <div class="summary-row total">
+        <span>Total</span>
+        <span id="modalTotal">Rp 0</span>
+      </div>
+    </div>
+
+    <div class="pay-method-label">
+      Metode Pembayaran
+    </div>
+
+    <div class="pay-method-grid">
+      <div class="pay-chip active" data-method="cash">Tunai</div>
+      <div class="pay-chip" data-method="card">Kartu</div>
+      <div class="pay-chip" data-method="ewallet">E-Wallet</div>
+    </div>
+
+    <div id="modalCashPayment">
+
+      <div class="cash-input-wrap">
+        <div class="cash-label">
+          Uang Diterima
+        </div>
+
+        <input
+          type="number"
+          id="modalCashReceived"
+          class="cash-input"
+          placeholder="Rp 0">
+      </div>
+
+      <div class="change-badge">
+        <span class="label">Kembalian</span>
+        <span class="amount" id="modalChange">Rp 0</span>
+      </div>
+
+    </div>
+<div class="cash-input-wrap">
+    <div class="cash-label">
+        Nama Customer
+    </div>
+
+    <input
+        type="text"
+        id="customerName"
+        class="cash-input"
+        placeholder="Contoh: Budi">
+</div>
+    <button
+      id="confirmPayment"
+      class="btn-pay"
+      disabled>
+      Bayar Sekarang
+    </button>
+
+  </div>
+</div>
 <!-- RECEIPT MODAL -->
 <div id="receiptModal" class="modal">
   <div class="receipt-box">
@@ -509,8 +613,10 @@ class POSSystem {
     document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', e => this.switchSection(e.target.dataset.section)));
     document.getElementById('logoutBtn').addEventListener('click', () => this.logout());
     document.getElementById('categoryFilter').addEventListener('change', () => this.renderProducts());
-    document.getElementById('cashReceived').addEventListener('input', () => this.calcChange());
-    document.getElementById('processPayment').addEventListener('click', () => this.processPayment());
+    // document.getElementById('cashReceived').addEventListener('input', () => this.calcChange());
+    document.getElementById('processPayment').addEventListener('click', () => this.openPaymentModal());
+    document.getElementById('confirmPayment').addEventListener('click', () => this.processPayment());
+    document.getElementById('modalCashReceived').addEventListener('input', () => this.calcChange());
     document.getElementById('clearCart').addEventListener('click', () => this.clearCart());
     document.getElementById('addProductBtn').addEventListener('click', () => this.openProductModal());
     document.getElementById('productForm').addEventListener('submit', e => { e.preventDefault(); this.saveProduct(); });
@@ -528,6 +634,20 @@ class POSSystem {
     });
     document.getElementById('reportDate').value = new Date().toISOString().split('T')[0];
   }
+openPaymentModal() {
+
+    if (!this.cart.length) return;
+
+    const subtotal = this.cart.reduce((s,i)=>s+i.total,0);
+    const tax = Math.round(subtotal * 0.1);
+    const total = subtotal + tax;
+
+    document.getElementById("modalSubtotal").textContent = this.fmt(subtotal);
+    document.getElementById("modalTax").textContent = this.fmt(tax);
+    document.getElementById("modalTotal").textContent = this.fmt(total);
+
+    document.getElementById("paymentModal").classList.add("active");
+}
 
   login() {
     const id = document.getElementById('employeeId').value;
@@ -548,9 +668,12 @@ class POSSystem {
   }
 
   setPerms() {
-    const isAdmin = this.currentUser.role === 'admin';
-    document.getElementById('productsNavBtn').disabled = !isAdmin;
-    document.getElementById('reportsNavBtn').disabled = !isAdmin;
+const isAdmin = this.currentUser.role === 'admin';
+
+document.getElementById('productsNavBtn').disabled = !isAdmin;
+
+// laporan bisa diakses semua
+document.getElementById('reportsNavBtn').disabled = false;
   }
 
   logout() {
@@ -563,7 +686,14 @@ class POSSystem {
   }
 
   switchSection(s) {
-    if (this.currentUser && ['products','reports'].includes(s) && this.currentUser.role !== 'admin') { alert('Akses ditolak!'); return; }
+if (
+    this.currentUser &&
+    s === 'products' &&
+    this.currentUser.role !== 'admin'
+){
+    alert('Akses ditolak!');
+    return;
+}
     document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     document.getElementById(s + 'Section').classList.add('active');
@@ -667,44 +797,52 @@ class POSSystem {
 
   removeItem(i) { this.cart.splice(i, 1); this.renderCart(); }
 
-  clearCart() {
-    this.cart = [];
-    document.getElementById('cashReceived').value = '';
-    document.getElementById('change').textContent = 'Rp 0';
+clearCart(){
+
+    this.cart=[];
+
+    document.getElementById("modalCashReceived").value="";
+    document.getElementById("modalChange").textContent="Rp 0";
+    document.getElementById("customerName").value="";
+
     this.renderCart();
-  }
+}
 
   updateSummary() {
-    const sub = this.cart.reduce((s, i) => s + i.total, 0);
-    const tax = Math.round(sub * 0.1);
-    const total = sub + tax;
-    document.getElementById('subtotal').textContent = this.fmt(sub);
-    document.getElementById('tax').textContent = this.fmt(tax);
-    document.getElementById('total').textContent = this.fmt(total);
-    this.calcChange();
-    const canPay = this.cart.length > 0;
-    if (this.paymentMethod !== 'cash') {
-      document.getElementById('processPayment').disabled = !canPay;
-    }
-  }
 
-  toggleCashInput(method) {
-    const el = document.getElementById('cashPayment');
-    el.style.display = method === 'cash' ? 'block' : 'none';
-    if (method !== 'cash') document.getElementById('processPayment').disabled = this.cart.length === 0;
-    else this.calcChange();
-  }
+    this.calcChange();
+
+    document.getElementById("processPayment").disabled =
+        this.cart.length === 0;
+}
+
+toggleCashInput(method){
+
+    document.getElementById("modalCashPayment").style.display =
+        method === "cash" ? "block" : "none";
+
+    this.calcChange();
+
+}
 
   calcChange() {
-    const sub = this.cart.reduce((s, i) => s + i.total, 0);
+    const sub = this.cart.reduce((s,i)=>s+i.total,0);
     const total = sub * 1.1;
-    const cash = parseFloat(document.getElementById('cashReceived').value) || 0;
+
+    const cash =
+        parseFloat(document.getElementById("modalCashReceived").value) || 0;
+
     const change = cash - total;
-    document.getElementById('change').textContent = this.fmt(Math.max(0, change));
-    if (this.paymentMethod === 'cash') {
-      document.getElementById('processPayment').disabled = this.cart.length === 0 || cash < total;
-    }
-  }
+
+    document.getElementById("modalChange").textContent =
+        this.fmt(Math.max(0, change));
+
+    // tombol Bayar Sekarang
+    document.getElementById("confirmPayment").disabled =
+        this.paymentMethod === "cash"
+            ? (this.cart.length === 0 || cash < total)
+            : this.cart.length === 0;
+}
 
   processPayment() {
     if (!this.cart.length) return;
@@ -713,20 +851,32 @@ class POSSystem {
     const total = sub + tax;
     let cashRec = 0, change = 0;
     if (this.paymentMethod === 'cash') {
-      cashRec = parseFloat(document.getElementById('cashReceived').value) || 0;
+      cashRec = parseFloat(document.getElementById('modalCashReceived').value) || 0;
       if (cashRec < total) { alert('Uang kurang!'); return; }
       change = cashRec - total;
     }
-    const trx = {
-      id:'TRX'+Date.now(), date:new Date(), cashier:this.currentUser.name,
-      items:[...this.cart], subtotal:sub, tax, total,
-      paymentMethod:this.paymentMethod, cashReceived:cashRec, change
+   const trx = {
+      id:'TRX'+Date.now(),
+      date:new Date(),
+      cashier:this.currentUser.name,
+
+      customer:
+        document.getElementById("customerName").value.trim() || "Guest",
+
+      items:[...this.cart],
+      subtotal:sub,
+      tax,
+      total,
+      paymentMethod:this.paymentMethod,
+      cashReceived:cashRec,
+      change
     };
     this.transactions.push(trx);
     this.cart.forEach(ci => {
       const p = this.products.find(p => p.code === ci.code);
       if (p) p.stock -= ci.quantity;
     });
+    closePaymentModal();
     this.showReceipt(trx);
     this.clearCart();
     this.renderProducts();
@@ -740,13 +890,14 @@ class POSSystem {
     let html = `
       <div class="receipt-brand">
         <div class="name">Wanen Coffee & Eatery</div>
-        <div class="addr">Jl. Tukad Yeh Aya, No. IX · @wanencoffee</div>
+        <div class="addr">Jl. Contoh No. 123 · @wanencoffee</div>
       </div>
       <hr class="receipt-dashed">
       <div class="receipt-meta">
         <div><span>No</span><span>${trx.id}</span></div>
         <div><span>Tanggal</span><span>${d}</span></div>
         <div><span>Kasir</span><span>${trx.cashier}</span></div>
+        <div><span>Customer</span><span>${trx.customer}</span></div>
       </div>
       <hr class="receipt-dashed">
       <div class="receipt-items">`;
@@ -857,13 +1008,57 @@ class POSSystem {
     const tbody = document.querySelector('#topProductsTable tbody');
     tbody.innerHTML = '';
     sorted.forEach(p => {
+      const historyBody =
+    document.querySelector("#transactionHistoryTable tbody");
+
+historyBody.innerHTML = "";
+
+trxs
+.slice()
+.reverse()
+.forEach(trx=>{
+
+    const row=document.createElement("tr");
+
+    const totalItem =
+        trx.items.reduce((s,i)=>s+i.quantity,0);
+
+    const itemList =
+        trx.items
+            .map(i=>`${i.name} (${i.quantity})`)
+            .join(", ");
+
+    const waktu = trx.date.toLocaleString("id-ID",{
+    day:"2-digit",
+    month:"2-digit",
+    year:"numeric",
+    hour:"2-digit",
+    minute:"2-digit"
+});
+
+row.innerHTML=`
+    <td>${waktu}</td>
+    <td>${trx.cashier}</td>
+    <td>${trx.customer}</td>
+    <td>${totalItem}</td>
+    <td>${itemList}</td>
+    <td>${this.fmt(trx.cashReceived || trx.total)}</td>
+    <td>${this.fmt(trx.change)}</td>
+    <td>${this.payLabel(trx.paymentMethod)}</td>
+`;
+
+    historyBody.appendChild(row);
+
+});
       const r = document.createElement('tr');
       r.innerHTML = `<td class="prod-name">${p.name}</td><td>${p.qty}</td><td class="price-cell">${this.fmt(p.rev)}</td>`;
       tbody.appendChild(r);
     });
   }
 }
-
+function closePaymentModal(){
+    document.getElementById("paymentModal").classList.remove("active");
+}
 function closeProductModal(){ pos.closeProductModal() }
 function closeReceiptModal(){ document.getElementById('receiptModal').classList.remove('active') }
 function printReceipt(){
