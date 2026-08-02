@@ -523,8 +523,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
     <div class="pay-method-grid">
       <div class="pay-chip active" data-method="cash">Tunai</div>
-      <div class="pay-chip" data-method="card">Kartu</div>
-      <div class="pay-chip" data-method="ewallet">E-Wallet</div>
+      <div class="pay-chip" data-method="Qris">Qris</div>
+      <!-- <div class="pay-chip" data-method="ewallet">E-Wallet</div> -->
     </div>
 
     <div id="modalCashPayment">
@@ -883,7 +883,7 @@ toggleCashInput(method){
     this.renderProductsTable();
   }
 
-  payLabel(m){ return {cash:'Tunai',card:'Kartu',ewallet:'E-Wallet'}[m]||m }
+  payLabel(m){ return {cash:'Tunai',qris:'Qris'}[m]||m }
 
   showReceipt(trx) {
     const d = trx.date.toLocaleString('id-ID');
