@@ -434,7 +434,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <th>Jumlah Item</th>
         <th>Item Dibeli</th>
         <th>Uang Diterima</th>
-        <th>Kembalian</th>
+        <!-- <th>Kembalian</th> -->
         <th>Metode</th>
     </tr>
 </thead>
@@ -1185,7 +1185,7 @@ class POSSystem {
         <td>${trx.jumlah}</td>
         <td>${itemList}</td>
         <td>${this.fmt(trx.cashReceived)}</td>
-        <td>${this.fmt(trx.change)}</td>
+ 
         <td>${this.payLabel(trx.paymentMethod)}</td>`;
       historyBody.appendChild(row);
     });
